@@ -1,0 +1,16 @@
+{
+  "name": "solidity-starter-kit",
+  "version": "1.0.0",
+  "description": "a repository for me to document my learning on solidity and smart contract",
+  "main": "truffle-config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.18"
+  }
+}
