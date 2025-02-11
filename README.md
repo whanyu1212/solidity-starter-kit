@@ -2,7 +2,7 @@
 A repository for me to document my learning on solidity and smart contract
 
 ### Setting up Solidity development environment locally
-Remix IDE (web-based) is tailored for Solidity Smart Contract development but it is not suited for full-fledged front-end development. I still prefer to do the development work whenever I need to build a proper project.
+Remix IDE (web-based) is tailored for Solidity Smart Contract development but it is not suited for full-fledged front-end development. I still prefer to do the development work locally whenever I need to build a proper project.
 
 Install solidity
 ```bash
