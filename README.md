@@ -1,7 +1,100 @@
 # solidity-starter-kit
-a repository for me to document my learning on solidity and smart contract
+A repository for me to document my learning on solidity and smart contract
+
+### Setting up Solidity development environment locally
+Remix IDE (web-based) is tailored for Solidity Smart Contract development but it is not suited for full-fledged front-end development. I still prefer to do the development work whenever I need to build a proper project.
+
+Install solidity
+```bash
+npm install -g solc
+```
+
+Install ganache for local blockchain simulator (allows quick contract testing without actual wallets)
+```bash
+npm install -g ganache
+```
+
+Initialize Node.js project
+```bash
+# Initialize Node.js project, this creates package.json and enables npm dependencies
+# Make sure you are in your root folder
+npm init -y 
+```
+
+Install hardhat locally for testing, compilation and deployment (alternatively, you can use Truffle)
+```bash
+npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
+```
+
+initialize hardhat project and automate the folder directory set up: it creates hardhat.config.js, contracts/ , scripts/ and test/ folders under the root directory
+```bash
+npx hardhat init
+```
+Now your project root folder will look something like the following:
+```
+your-project/
+├── contracts/
+├── scripts/
+├── test/
+├── hardhat.config.js
+├── package.json
+└── node_modules/
+```
 
 ### Learning Points
+
+<details>
+  <summary>Basic Blockchain Concept</summary>
+  <br>
+
+A decentralized, public ledger where information (transactions, contracts, etc.) is recorded permanently
+
+**What is a "Block" and a "Chain"?**
+
+- A **Block** = A batch of transactions that are grouped together, verified, and added to the ledger.
+- A **Chain** = A sequence of blocks linked together, forming a history of all transactions.
+
+Each block contains:
+
+1. Transactions – Actions like payments, smart contract executions, or NFT transfers.
+2. A Reference to the Previous Block – This links it to the previous block, forming a chain.
+3. A Unique Code (Hash) – A digital fingerprint ensuring the block's integrity.
+4. Once a block is added to the chain, it cannot be changed—which is what makes blockchain secure and trustworthy.
+
+<br>
+
+**<u>Blockchain vs Traditional Systems</u>**
+| Feature          | Traditional Systems (Banks, Cloud, etc.) | Blockchain (Decentralized, On-Chain) |
+|-----------------|----------------------------------|--------------------------------|
+| **Control**      | Centralized authority (bank, company) | No single owner, fully distributed |
+| **Security**     | Can be hacked, single point of failure | Highly secure, no central point to attack |
+| **Trust**        | Requires trust in institutions | Trustless, automated verification |
+| **Transparency** | Private records | Fully public and auditable |
+| **Data Changes** | Can be altered/deleted | Immutable, cannot be changed |
+| **Middlemen**    | Needed (banks, payment processors) | Not needed, peer-to-peer transactions |
+| **Availability** | Can go offline | Always online as long as nodes exist |
+
+<br>
+
+**<u>Key Differences Between Blockchain & Cloud Deployment:</u>**
+| Feature            | Cloud Deployment (AWS, GCP, etc.) | Blockchain Deployment (Ethereum, Solana, etc.) |
+|--------------------|----------------------------------|----------------------------------------------|
+| **Ownership**      | Owned & controlled by a company | Decentralized, no single owner              |
+| **Immutability**   | Code can be updated/redeployed  | Once deployed, cannot be changed            |
+| **Availability**   | Dependent on cloud provider uptime | Always available as long as the network exists |
+| **Execution**      | Runs on centralized servers     | Runs on decentralized nodes (miners/validators) |
+| **Trust**          | Users must trust the cloud provider | Trustless – code executes as programmed  |
+| **Security**       | Protected by the provider’s security measures | Secured by cryptography and consensus mechanisms |
+| **Scaling**        | Can scale dynamically with resources | Limited scalability (depends on network throughput) |
+| **Data Storage**   | Stored in databases (SQL, NoSQL) | Stored on-chain (expensive) or off-chain (IPFS, Arweave) |
+| **Cost**           | Pay for compute/storage based on usage | Pay **gas fees** for every interaction  |
+| **Transparency**   | Code execution is private unless made public | Everything is publicly verifiable on-chain |
+
+<br>
+
+</details>
+
+
 <details>
   <summary>ERC20 & Fungible Tokens</summary>
   <br>
