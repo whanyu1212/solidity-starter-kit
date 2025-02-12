@@ -11,9 +11,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 // to avoid any errors in the future due to changes in the source code
 /**
  * @title ModifiedERC20
- * @dev This contract demonstrates the use of state variables and functions in Solidity.
+ * @dev This contract demonstrates an extension of the ERC20 token with additional features.
  * @author hy
- * @notice Date: 07/02/2025
+ * @notice Date: 08/02/2025
  */
 contract ModifiedERC20 is ERC20 {
     // --------------------------------------------------
