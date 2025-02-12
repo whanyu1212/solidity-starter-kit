@@ -9,33 +9,54 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 // Instead of copying the source code, we import it from OpenZeppelin library
 // to avoid any errors in the future due to changes in the source code
-contract ModifiedER20 is ERC20 {
-    // Adding a state variable called owner
+/**
+ * @title ModifiedERC20
+ * @dev This contract demonstrates the use of state variables and functions in Solidity.
+ * @author hy
+ * @notice Date: 07/02/2025
+ */
+contract ModifiedERC20 is ERC20 {
+    // --------------------------------------------------
+    // State Variables
+    // --------------------------------------------------
+    // Owner and constants
     address private _owner;
     uint8 private constant _decimals = 18; // 18 is the standard number of decimals for ERC20 tokens
+
+    // Mapping
     mapping(address => bool) private _frozenAccounts; // Mapping to store frozen accounts
+
+    // --------------------------------------------------
+    // Events
+    // --------------------------------------------------
     event AccountFrozen(address indexed account);
     event AccountUnfrozen(address indexed account);
 
     // In the constructor, we are calling the constructor of the base ERC20 contract
     // giving the token a name and a symbol and minting some initial supply
     // 1000000 * 10^18 = 1,000,000,000,000,000,000,000,000 (wei equivalent)
-    constructor() ERC20("ModifiedER20", "MERC") {
-        uint8 decimals = _decimals;
-        _owner = msg.sender; // Setting the owner to the address that deploys the contract
-        _mint(msg.sender, 1000000 * 10 ** decimals);
+    // removed hardcoded values and added parameters to the constructor
+    constructor(
+        string memory name,
+        string memory symbol,
+        uint256 initialSupply
+    ) ERC20(name, symbol) {
+        _owner = msg.sender;
+        _mint(msg.sender, initialSupply);
     }
 
-    // Adding a function to check if the caller is the owner
-    // _ before the function name is a convention to indicate
-    // that this function is private (or internal use only)
+    /**
+     * @notice This function checks if the caller is the owner of the contract.
+     */
     function _checkOwner() internal view {
         if (_owner != msg.sender) {
             revert();
         }
     }
 
-    // Middleware
+    /**
+     * @notice This modifier checks if the caller is the owner of the contract.
+     */
     modifier onlyOwner() {
         _checkOwner(); // pre-condition
         _; // placeholder for original function execution
@@ -43,30 +64,59 @@ contract ModifiedER20 is ERC20 {
         // the original function is executed
     }
 
+    /**
+     * @notice This function mints new tokens and assigns them to the specified account.
+     * @param to The account to which the new tokens will be assigned.
+     * @param amount The amount of tokens to mint.
+     */
     function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
     }
 
+    /**
+     * @notice This function burns tokens from the specified account.
+     * @param from The account from which the tokens will be burned.
+     * @param amount The amount of tokens to burn.
+     */
     function burn(address from, uint256 amount) external onlyOwner {
         _burn(from, amount);
     }
 
+    /**
+     * @notice This function freezes the specified account.
+     * @param account The account to be frozen.
+     */
     function freezeAccount(address account) public onlyOwner {
         require(!_frozenAccounts[account], "Account is already frozen");
         _frozenAccounts[account] = true; // change the value in the mapping
         emit AccountFrozen(account); // This emits an indexed event
     }
 
+    /**
+     * @notice This function unfreezes the specified account.
+     * @param account The account to be unfrozen.
+     */
     function unfreezeAccount(address account) public onlyOwner {
         require(_frozenAccounts[account], "Account is not frozen");
         _frozenAccounts[account] = false; // change the value in the mapping
         emit AccountUnfrozen(account);
     }
 
+    /**
+     * @notice This function checks if the specified account is frozen.
+     * @param account The account to check.
+     * @return A boolean value indicating whether the account is frozen.
+     */
     function isAccountFrozen(address account) public view returns (bool) {
         return _frozenAccounts[account];
     }
 
+    /**
+     * @notice This function transfers tokens from the sender to the recipient.
+     * @param recipient The account to which the tokens will be transferred.
+     * @param amount The amount of tokens to transfer.
+     * @return A boolean value indicating whether the transfer was successful.
+     */
     function transfer(
         address recipient,
         uint256 amount
@@ -81,6 +131,13 @@ contract ModifiedER20 is ERC20 {
         return true;
     }
 
+    /**
+     * @notice This function transfers tokens from the sender to the recipient using the sender's allowance.
+     * @param sender The account from which the tokens will be transferred.
+     * @param recipient The account to which the tokens will be transferred.
+     * @param amount The amount of tokens to transfer.
+     * @return A boolean value indicating whether the transfer was successful.
+     */
     function transferFrom(
         address sender,
         address recipient,
@@ -95,54 +152,5 @@ contract ModifiedER20 is ERC20 {
         _transfer(sender, recipient, amount);
 
         return true;
-    }
-}
-
-contract TokenSwap {
-    // The interface of IERC is available because we imported the ERC20.sol file
-    IERC20 public token1;
-    address public owner1;
-    uint256 public amount1;
-    IERC20 public token2;
-    address public owner2;
-    uint256 public amount2;
-    constructor(
-        address _token1,
-        address _owner1,
-        uint256 _amount1,
-        address _token2,
-        address _owner2,
-        uint256 _amount2
-    ) {
-        token1 = IERC20(_token1);
-        owner1 = _owner1;
-        amount1 = _amount1;
-        token2 = IERC20(_token2);
-        owner2 = _owner2;
-        amount2 = _amount2;
-    }
-    function swap() public {
-        require(msg.sender == owner1 || msg.sender == owner2, "Not authorized");
-        require(
-            // allowance reads current spending limit
-            token1.allowance(owner1, address(this)) >= amount1,
-            "Token 1 allowance too low"
-        );
-        require(
-            token2.allowance(owner2, address(this)) >= amount2,
-            "Token 2 allowance too low"
-        );
-        _safeTransferFrom(token1, owner1, owner2, amount1);
-        _safeTransferFrom(token2, owner2, owner1, amount2);
-    }
-
-    function _safeTransferFrom(
-        IERC20 token,
-        address sender,
-        address recipient,
-        uint256 amount
-    ) private {
-        bool sent = token.transferFrom(sender, recipient, amount);
-        require(sent, "Token transfer failed");
     }
 }

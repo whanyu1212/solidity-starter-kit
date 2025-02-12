@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 async function main() {
     // Deploy contract
     const ModifiedER20 = await ethers.getContractFactory("ModifiedER20");
-    const token = await ModifiedER20.deploy();
+    const token = await ModifiedER20.deploy("ModifiedERC20", "MERC", ethers.parseEther("1000000"));
     await token.waitForDeployment();
     
     // Get player accounts
