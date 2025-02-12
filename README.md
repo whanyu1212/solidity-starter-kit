@@ -120,6 +120,33 @@ Each block contains:
 <br>
 
 <details>
+  <summary>NatSpec Tags</summary>
+
+- **@title**  
+  - **Purpose:** Provides a concise title or summary of the contract.  
+  - **When to Use:** Always include this at the top of your contract so users quickly understand its purpose.
+
+- **@dev**  
+  - **Purpose:** Offers additional technical details meant for developers.  
+  - **When to Use:** Use this to explain implementation details, inner workings, or important notes that are not immediately obvious from the code. This is especially useful for auditing or future maintenance.
+
+- **@notice**  
+  - **Purpose:** Describes what the contract or function does in user-friendly language.  
+  - **When to Use:** Include it to inform end users or non-developer stakeholders about the behavior or purpose without exposing intricate internal details.
+
+- **@param**  
+  - **Purpose:** Documents function parameters; it describes the purpose of each argument passed to a function.  
+  - **When to Use:** Always include one `@param` tag per parameter when a function accepts one or more parameters, specifying the parameter name and its role.
+
+- **@return**  
+  - **Purpose:** Explains what a function returns.  
+  - **When to Use:** Use it in functions that return data to clarify what the returned value represents.
+
+</details>
+
+<br>
+
+<details>
   <summary>ERC20 & Fungible Tokens</summary>
   <br>
   
