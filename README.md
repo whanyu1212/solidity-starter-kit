@@ -94,6 +94,30 @@ Each block contains:
 
 </details>
 
+<br>
+
+<details>
+  <summary>Data Locations & Best Practices</summary>
+
+  1. #### Storage
+   - Persistent storage (like a hard drive)
+   - Most expensive gas cost
+   - State variables are storage by default
+   - Persists between function calls
+  2. #### Memory
+   - Temporary storage (like RAM)
+   - Medium gas cost
+   - Cleared after function execution
+   - Used for function parameters and local variables
+  3. #### Calldata
+   - Read-only temporary storage
+   - Lowest gas cost
+   - Used for function parameters
+   - Cannot be modified
+
+</details>
+
+<br>
 
 <details>
   <summary>ERC20 & Fungible Tokens</summary>
