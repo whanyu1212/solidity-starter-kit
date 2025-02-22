@@ -97,6 +97,27 @@ Each block contains:
 <br>
 
 <details>
+  <summary>Ethereum fundamentals</summary>
+
+  #### Ether and Gas
+
+  Ether Units Explained:
+  - Ether: The main currency of Ethereum
+  - Wei: The smallest unit of Ether
+  - 1 Ether = 1,000,000,000,000,000,000 wei (1e18 wei)
+  - Gwei: Commonly used for gas prices
+  - 1 Gwei = 1,000,000,000 wei (1e9 wei)
+  - 1 Ether = 1,000,000,000 Gwei
+  
+  ```
+  1 ether = 1e18 wei = 1,000,000,000 gwei
+  1 gwei = 1e9 wei
+  ```
+</details>
+
+<br>
+
+<details>
   <summary>Data Locations & Best Practices</summary>
 
   1. #### Storage
@@ -168,4 +189,95 @@ Each block contains:
   It provides the basic functionality for <u>transferring tokens, approving spending by other accounts, and querying balances and total supply.</u>
 
   The ERC20 contract in OpenZeppelin is often implemented as an **<u>abstract contract</u>** because it provides a basic framework but leaves some implementation details to be defined in derived contracts, e.g., Lab2's example. Note that abstract contract cannot be deployed directly.
+
+  <br>
+
+  **ERC20 Token Standard Interface**
+
+  ```mermaid
+  classDiagram
+      class ERC20 {
+          +string name
+          +string symbol
+          +uint8 decimals
+          -uint256 _totalSupply
+          -mapping(address => uint256) _balances
+          -mapping(address => mapping(address => uint256)) _allowances
+          
+          +totalSupply() uint256
+          +balanceOf(address owner) uint256
+          +transfer(address to, uint256 value) bool
+          +transferFrom(address from, address to, uint256 value) bool
+          +approve(address spender, uint256 value) bool
+          +allowance(address owner, address spender) uint256
+      }
+  ```
+</details>
+
+<br>
+
+<details>
+  <summary>ERC721 & Non-Fungible Tokens</summary>
+  <br>
+  
+  #### Basic Concept:
+  <br>
+
+  Non-fungible tokens (NFTs) are unique digital assets where **<u>no two tokens are identical</u>**. Unlike fungible tokens, each NFT has distinct characteristics and value. Key characteristics include:
+
+  - Each token has a unique identifier (tokenId)
+  - Cannot be subdivided (1 NFT remains 1 NFT)
+  - Built using standards like ERC721 or ERC1155
+  - Often represents ownership of digital or real-world assets
+
+  <br>
+  
+  ERC721 defines the standard for **<u>non-fungible tokens</u>** on Ethereum. Each token is **<u>unique</u>** and represents distinct ownership (like digital art, collectibles, or real estate, a.k.a **非同质化代币**).
+
+  This standard enables NFTs to be traded on marketplaces and integrated into various applications while maintaining their unique properties and ownership history.
+
+  It provides functionality for <u>minting, transferring, and managing unique tokens, with each token having its own distinct ID and metadata</u>.
+
+  <br>
+
+  **ERC721 Token Standard Interface**
+
+  ```mermaid
+  classDiagram
+      class ERC721 {
+          +string name
+          +string symbol
+          -mapping(uint256 => address) _owners
+          -mapping(address => uint256) _balances
+          -mapping(uint256 => address) _tokenApprovals
+          -mapping(address => mapping(address => bool)) _operatorApprovals
+          
+          +balanceOf(address owner) uint256
+          +ownerOf(uint256 tokenId) address
+          +safeTransferFrom(address from, address to, uint256 tokenId, bytes data)
+          +safeTransferFrom(address from, address to, uint256 tokenId)
+          +transferFrom(address from, address to, uint256 tokenId)
+          +approve(address to, uint256 tokenId)
+          +setApprovalForAll(address operator, bool approved)
+          +getApproved(uint256 tokenId) address
+          +isApprovedForAll(address owner, address operator) bool
+      }
+  ```
+
+</details>
+
+<br>
+
+<details>
+  <summary>ERC20 VS ERC721</summary>
+
+    Key differences between ERC20 and ERC721:
+  | Feature | ERC20 (Fungible) | ERC721 (Non-Fungible) |
+  |---------|------------------|----------------------|
+  | Uniqueness | All tokens identical | Each token unique |
+  | Divisibility | Can be split (e.g., 0.5) | Cannot be split |
+  | ID | No individual IDs | Each token has unique ID |
+  | Value | Equal value per token | Value varies by token |
+  | Transfer | Simple transfer | Transfer with specific ID |
+  | Use Case | Currency, shares | Collectibles, art, property |
 </details>
