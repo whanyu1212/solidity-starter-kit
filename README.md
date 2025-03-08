@@ -271,7 +271,8 @@ Each block contains:
 <details>
   <summary>ERC20 VS ERC721</summary>
 
-    Key differences between ERC20 and ERC721:
+  Key differences between ERC20 and ERC721:
+
   | Feature | ERC20 (Fungible) | ERC721 (Non-Fungible) |
   |---------|------------------|----------------------|
   | Uniqueness | All tokens identical | Each token unique |
@@ -280,4 +281,23 @@ Each block contains:
   | Value | Equal value per token | Value varies by token |
   | Transfer | Simple transfer | Transfer with specific ID |
   | Use Case | Currency, shares | Collectibles, art, property |
+</details>
+
+<br>
+
+<details>
+  <summary>Function Visbility</summary>
+
+  - `external`: it is part of our contract’s interface and can be called from other contracts, or from transactions, but <u>cannot be called from within the contract</u> or at least not without an explicit reference to the object it is being called on
+
+  - `public`: they can be called from other contracts or transactions, but additionally they <u>can be called internally</u>. This means you can use an implicit receiver of the message when invoking the method inside of a method
+
+  - `internal` & `private`: must use the implicit receiver or, in other words, **cannot be called on an object or on this**. The main difference between these two modifiers is that private functions are only visible within the contract in which they are defined, and not in derived contracts
+
+  - `pure` & `view`: will not alter the state of the contract's variables. `pure` functions do not read from the blockchain. They operate on data passed in or do not need any input. `view` functions can read data from the blockchain but they cannot write to the blockchain.
+
+  - `memory`: not referencing anything located in our contract’s persisted storage
+
+  - `calldata`: only needed when the function is declared as external and when the data type of the parameter is a reference type such as a mapping, struct, string, or array. Using value types like int or address do not require this label
+
 </details>
