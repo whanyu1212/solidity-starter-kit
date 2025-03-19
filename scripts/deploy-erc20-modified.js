@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 
 async function main() {
     // Deploy contract
-    const ModifiedER20 = await ethers.getContractFactory("ModifiedER20");
+    const ModifiedERC20 = await ethers.getContractFactory("ModifiedERC20");
     const token = await ModifiedER20.deploy("ModifiedERC20", "MERC", ethers.parseEther("1000000"));
     await token.waitForDeployment();
     
