@@ -1,25 +1,24 @@
+<!-- omit in toc -->
 # Solidity Starter Kit
 A repository for me to document my learning on solidity and smart contract
 
+<!-- omit in toc -->
 ## Table of Contents
-- [Solidity Starter Kit](#solidity-starter-kit)
-  - [Table of Contents](#table-of-contents)
-    - [Setting up Solidity development environment locally](#setting-up-solidity-development-environment-locally)
-    - [Basic Blockchain Concept](#basic-blockchain-concept)
-      - [Blockchain vs Traditional Systems](#blockchain-vs-traditional-systems)
-      - [Key Differences Between Blockchain \& Cloud Deployment](#key-differences-between-blockchain--cloud-deployment)
-    - [Ethereum Fundamentals](#ethereum-fundamentals)
-      - [Ether Units](#ether-units)
-      - [Data Locations \& Best Practices](#data-locations--best-practices)
-    - [Functions](#functions)
-      - [Structure](#structure)
-      - [Visibility](#visibility)
-      - [Constructor and Destructor Functions](#constructor-and-destructor-functions)
-      - [Fallback Function](#fallback-function)
-    - [NatSpec Tags](#natspec-tags)
-    - [Token Standards](#token-standards)
-      - [ERC20 \& Fungible Tokens](#erc20--fungible-tokens)
-      - [ERC721 \& Non-Fungible Tokens](#erc721--non-fungible-tokens)
+- [Setting up Solidity development environment locally](#setting-up-solidity-development-environment-locally)
+- [Basic Blockchain Concept](#basic-blockchain-concept)
+  - [Blockchain vs Traditional Systems](#blockchain-vs-traditional-systems)
+- [Ethereum Fundamentals](#ethereum-fundamentals)
+  - [Ether Units](#ether-units)
+  - [Data Locations \& Best Practices](#data-locations--best-practices)
+- [Functions](#functions)
+  - [Structure](#structure)
+  - [Visibility](#visibility)
+  - [Constructor and Destructor Functions](#constructor-and-destructor-functions)
+  - [Fallback Function](#fallback-function)
+- [NatSpec Tags](#natspec-tags)
+- [Token Standards](#token-standards)
+  - [ERC20 \& Fungible Tokens](#erc20--fungible-tokens)
+  - [ERC721 \& Non-Fungible Tokens](#erc721--non-fungible-tokens)
 
 ---
 
@@ -43,7 +42,7 @@ Initialize Node.js project
 npm init -y 
 ```
 
-Install hardhat locally for testing, compilation and deployment (alternatively, you can use Truffle)
+Install hardhat locally for testing, compilation and deployment (alternatively, you can use Truffle but it is a sunset project)
 ```bash
 npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
 ```
@@ -81,6 +80,8 @@ Each block contains:
 3. A Unique Code (Hash) – A digital fingerprint ensuring the block's integrity.
 4. Once a block is added to the chain, it cannot be changed—which is what makes blockchain secure and trustworthy.
 
+<br>
+
 #### Blockchain vs Traditional Systems
 
 | Feature          | Traditional Systems (Banks, Cloud, etc.) | Blockchain (Decentralized, On-Chain) |
@@ -92,21 +93,6 @@ Each block contains:
 | **Data Changes** | Can be altered/deleted | Immutable, cannot be changed |
 | **Middlemen**    | Needed (banks, payment processors) | Not needed, peer-to-peer transactions |
 | **Availability** | Can go offline | Always online as long as nodes exist |
-
-#### Key Differences Between Blockchain & Cloud Deployment
-
-| Feature            | Cloud Deployment (AWS, GCP, etc.) | Blockchain Deployment (Ethereum, Solana, etc.) |
-|--------------------|----------------------------------|----------------------------------------------|
-| **Ownership**      | Owned & controlled by a company | Decentralized, no single owner              |
-| **Immutability**   | Code can be updated/redeployed  | Once deployed, cannot be changed            |
-| **Availability**   | Dependent on cloud provider uptime | Always available as long as the network exists |
-| **Execution**      | Runs on centralized servers     | Runs on decentralized nodes (miners/validators) |
-| **Trust**          | Users must trust the cloud provider | Trustless – code executes as programmed  |
-| **Security**       | Protected by the provider's security measures | Secured by cryptography and consensus mechanisms |
-| **Scaling**        | Can scale dynamically with resources | Limited scalability (depends on network throughput) |
-| **Data Storage**   | Stored in databases (SQL, NoSQL) | Stored on-chain (expensive) or off-chain (IPFS, Arweave) |
-| **Cost**           | Pay for compute/storage based on usage | Pay **gas fees** for every interaction  |
-| **Transparency**   | Code execution is private unless made public | Everything is publicly verifiable on-chain |
 
 --- 
 
@@ -145,8 +131,6 @@ Ether Units Explained:
    - Used for function parameters
    - Cannot be modified
 
-<br>
-
 ---
 
 ### Functions
@@ -155,6 +139,8 @@ Ether Units Explained:
 - Input parameters
 - Access Modifiers
 - Output Parameters
+  
+<br>
 
 #### Visibility
 
@@ -170,10 +156,14 @@ Ether Units Explained:
 
 - `calldata`: Only needed when the function is declared as external and when the data type of the parameter is a reference type such as a mapping, struct, string, or array. Using value types like int or address do not require this label.
 
+<br>
+
 #### Constructor and Destructor Functions
 - A constructor is called to initialize the smart contract when the smart contract is deployed.
 
 <img src="./pics/B19140_06_11.jpg" alt="Constructor example" width="400" />
+
+<br>
 
 #### Fallback Function
 - A contract can have **exactly one** fallback function
