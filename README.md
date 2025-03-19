@@ -15,11 +15,19 @@ A repository for me to document my learning on solidity and smart contract
   - [Visibility](#visibility)
   - [Constructor and Destructor Functions](#constructor-and-destructor-functions)
   - [Fallback Function](#fallback-function)
+  - [Function overloading](#function-overloading)
+  - [Function Modifier](#function-modifier)
+- [Events](#events)
+- [Global \& Contextual Variables (and functions)](#global--contextual-variables-and-functions)
 - [NatSpec Tags](#natspec-tags)
+- [Understanding inheritance, abstract contracts and interfaces](#understanding-inheritance-abstract-contracts-and-interfaces)
+  - [Interfaces](#interfaces)
+  - [Abstract Contracts](#abstract-contracts)
+  - [Inheritance](#inheritance)
+  - [Function overriding](#function-overriding)
 - [Token Standards](#token-standards)
   - [ERC20 \& Fungible Tokens](#erc20--fungible-tokens)
   - [ERC721 \& Non-Fungible Tokens](#erc721--non-fungible-tokens)
-
 ---
 
 ### Setting up Solidity development environment locally
@@ -172,6 +180,50 @@ Ether Units Explained:
 
 <img src="./pics/B19140_06_13.jpg" alt="Fallback example" width="400" />
 
+<br>
+
+#### Function overloading
+- you may define multiple functions with the same name but with different input parameter types
+- Return types don’t count as part of the overloading resolution.
+<img src="./pics/B19140_06_15.jpg" alt="Overloading" width="400" />
+
+<br>
+
+#### Function Modifier
+- Similar to Aspect-oriented programming
+- Change or augment the behavior of a function
+<img src="./pics/B19140_06_16.jpg" alt="function modifier" width="400" />
+
+---
+
+
+### Events
+- Used to track the execution of a transaction that’s sent to a contract
+- DApps can subscribe and listen to these events through the Web3 JSON-RPC interface
+
+<img src="./pics/B19140_06_17.jpg" alt="Events" width="400" />
+
+---
+
+### Global & Contextual Variables (and functions)
+
+| Variable/Function | Type | Description |
+|-------------------|------|-------------|
+| `blockhash(uint blockNumber)` | `bytes32` | Returns the hash of the given block. Only works for the 256 most recent blocks, excluding current. |
+| `block.coinbase` | `address payable` | Returns the current block miner's address. |
+| `block.difficulty` | `uint` | Returns the current block's difficulty. |
+| `block.gaslimit` | `uint` | Returns the current block's gas limit. |
+| `block.number` | `uint` | Returns the current block's number. |
+| `block.timestamp` | `uint` | Returns the current block's timestamp in seconds since Unix epoch. |
+| `gasleft()` | `uint256` | Returns remaining gas in current execution. |
+| `msg.data` | `bytes calldata` | Returns complete call data. |
+| `msg.sender` | `address payable` | Returns the sender of the message (current call). |
+| `msg.sig` | `bytes4` | Returns the first four bytes of the call data (function identifier). |
+| `msg.value` | `uint` | Returns the number of Wei sent with the message. |
+| `now` | `uint` | Returns the current block timestamp (alias for block.timestamp). |
+| `tx.gasprice` | `uint` | Returns the gas price of the transaction. |
+| `tx.origin` | `address payable` | Returns the sender of the transaction (full call chain). |
+
 ---
 
 ### NatSpec Tags
@@ -195,6 +247,34 @@ Ether Units Explained:
 - **@return**  
   - **Purpose:** Explains what a function returns.  
   - **When to Use:** Use it in functions that return data to clarify what the returned value represents.
+
+---
+
+### Understanding inheritance, abstract contracts and interfaces
+
+#### Interfaces
+- Can extend from other interfaces, but it cannot inherit from other contracts
+- Doesn’t have any function with an implementation
+- All declared functions in an interface must be external
+- Doesn’t have a constructor
+- Cannot declare state variables
+- Cannot declare modifiers
+
+<img src="./pics/B19140_06_18.jpg" alt = "Interfaces" width="400" />
+
+#### Abstract Contracts
+- Similar to abstract class
+- Defines all the methods for a contract to implement
+
+#### Inheritance
+- Can extend from other contracts, abstract contracts, or interfaces
+
+<img src="./pics/B19140_06_19.jpg" alt="Inheritance" width="400" />
+
+#### Function overriding
+- Ability of one method in the subcontract to override the behaviors of the same method on the base contract
+
+<img src="./pics/B19140_06_22.jpg" alt="function overriding" width="400" />
 
 ---
 
