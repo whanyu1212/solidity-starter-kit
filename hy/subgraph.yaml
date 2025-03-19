@@ -1,0 +1,35 @@
+specVersion: 1.2.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: ModifiedERC20
+    network: kaia-testnet
+    source:
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      abi: ModifiedERC20
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - AccountFrozen
+        - AccountUnfrozen
+        - Approval
+        - Transfer
+      abis:
+        - name: ModifiedERC20
+          file: ./abis/ModifiedERC20.json
+      eventHandlers:
+        - event: AccountFrozen(indexed address)
+          handler: handleAccountFrozen
+        - event: AccountUnfrozen(indexed address)
+          handler: handleAccountUnfrozen
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/modified-erc-20.ts
