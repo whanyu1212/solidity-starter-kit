@@ -11,9 +11,12 @@
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.18"
+    "dotenv": "^16.4.7",
+    "hardhat": "^2.22.19"
   },
   "dependencies": {
+    "@bisonai/orakl-cli": "^0.6.2",
+    "@bisonai/orakl-contracts": "^2.0.2",
     "@openzeppelin/contracts": "^5.2.0"
   }
 }
