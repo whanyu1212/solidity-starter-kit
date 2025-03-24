@@ -7,6 +7,8 @@ A repository for me to document my learning on solidity and smart contract
 - [Setting up Solidity development environment locally](#setting-up-solidity-development-environment-locally)
 - [Basic Blockchain Concept](#basic-blockchain-concept)
   - [Blockchain vs Traditional Systems](#blockchain-vs-traditional-systems)
+  - [Solving Double Spending](#solving-double-spending)
+  - [Proof-of-work (PoW) mechanism](#proof-of-work-pow-mechanism)
 - [Ethereum Fundamentals](#ethereum-fundamentals)
   - [Ether Units](#ether-units)
   - [Data Locations \& Best Practices](#data-locations--best-practices)
@@ -101,6 +103,51 @@ Each block contains:
 | **Data Changes** | Can be altered/deleted | Immutable, cannot be changed |
 | **Middlemen**    | Needed (banks, payment processors) | Not needed, peer-to-peer transactions |
 | **Availability** | Can go offline | Always online as long as nodes exist |
+
+<br>
+
+#### Solving Double Spending
+
+illustration:
+<img src="./pics/1742827531253.jpg" alt="Constructor example" width="400" />
+
+**Possible Solutions:**
+1. A leader decides the order of the transaction (the event of a leader server failure?)
+2. A leader decides the order of transactions **+** The next server becomes a leader if the current leader doesn't suggest the next
+transaction for 10 seconds (What if one server may believe the leader has changed, while another may not?)
+3. A leader decides the order of transactions **+** The next server becomes a leader if the current leader doesn't suggest a next
+transaction for 10 seconds **+** A leader collects confirmations from other servers about the order suggestion (what if a server lies?)
+
+<br>
+
+**Concensus Algorithm:**
+- Bitcoin uses the Nakamoto consensus mechanism: a combination of **Proof-of-work** and **Longest chain rule**
+- Ethereum switched a Proof-of-Stake mechanism since Sept 2022, claims to have reduced energy consumption significantly compared to PoW, while maintaining network security through economic incentives.
+
+#### Proof-of-work (PoW) mechanism
+1. **Block Formation**
+   - Transaction Collection: Miners collect pending transactions and organize them into a block.
+
+   - Block Header: This contains metadata such as the previous block's hash, a timestamp, the Merkle root of the transactions, a nonce, and other fields.
+
+2. **The Hash Puzzle**
+   - Hash Function: The block header is fed into a cryptographic hash function (Bitcoin uses SHA-256) which produces a fixed-size output (a hash).
+
+   - Difficulty Target: The network sets a difficulty target. For a block to be valid, its hash must be lower than this target. In practice, this is often represented as the hash having a certain number of leading zeros.
+
+   - Nonce: The nonce is a number that miners adjust to change the block header's hash output. By incrementing the nonce, miners generate different hashes until one meets the difficulty condition.
+
+3. **The Mining Process**
+   - Iteration: Miners try different nonce values (and sometimes adjust other parts of the block header) in a trial-and-error process.
+
+   - Computational Work: Because there is no shortcut to predict the correct nonce, miners must compute many hashes until they find one that satisfies the condition. This work is deliberately resource-intensive.
+
+   - Block Broadcast: Once a valid nonce is found, the block is broadcast to the network for validation. Other nodes check the block's hash and confirm that it meets the difficulty criteria.
+
+4. **Security and Consensus**
+   - Costly Attack: The high computational cost makes it economically impractical for an attacker to alter past blocks since they would need to redo the work for that block and all subsequent blocks.
+
+   - Longest Chain Rule: The network follows the chain with the most accumulated work, ensuring that the block with valid proof-of-work is accepted even if two blocks are found nearly simultaneously.
 
 --- 
 
