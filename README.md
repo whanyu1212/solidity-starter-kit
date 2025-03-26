@@ -8,7 +8,11 @@ A repository for me to document my learning on solidity and smart contract
 - [Basic Blockchain Concept](#basic-blockchain-concept)
   - [Blockchain vs Traditional Systems](#blockchain-vs-traditional-systems)
   - [Solving Double Spending](#solving-double-spending)
-  - [Proof-of-work (PoW) mechanism](#proof-of-work-pow-mechanism)
+  - [Proof-of-work mechanism](#proof-of-work-mechanism)
+  - [Wallet](#wallet)
+  - [Hash function](#hash-function)
+  - [Transaction](#transaction)
+  - [UTXO (Unspent Transaction Output)](#utxo-unspent-transaction-output)
 - [Ethereum Fundamentals](#ethereum-fundamentals)
   - [Ether Units](#ether-units)
   - [Data Locations \& Best Practices](#data-locations--best-practices)
@@ -90,6 +94,10 @@ Each block contains:
 3. A Unique Code (Hash) – A digital fingerprint ensuring the block's integrity.
 4. Once a block is added to the chain, it cannot be changed—which is what makes blockchain secure and trustworthy.
 
+<img src="./pics/1743003065638.jpg" alt="Constructor example" width="400" />
+<img src="./pics/1743003192161.jpg" alt="Constructor example" width="400" />
+<img src="./pics/1743003280740.jpg" alt="Constructor example" width="500" />
+
 <br>
 
 #### Blockchain vs Traditional Systems
@@ -124,7 +132,7 @@ transaction for 10 seconds **+** A leader collects confirmations from other serv
 - Bitcoin uses the Nakamoto consensus mechanism: a combination of **Proof-of-work** and **Longest chain rule**
 - Ethereum switched a Proof-of-Stake mechanism since Sept 2022, claims to have reduced energy consumption significantly compared to PoW, while maintaining network security through economic incentives.
 
-#### Proof-of-work (PoW) mechanism
+#### Proof-of-work mechanism
 1. **Block Formation**
    - Transaction Collection: Miners collect pending transactions and organize them into a block.
 
@@ -148,6 +156,51 @@ transaction for 10 seconds **+** A leader collects confirmations from other serv
    - Costly Attack: The high computational cost makes it economically impractical for an attacker to alter past blocks since they would need to redo the work for that block and all subsequent blocks.
 
    - Longest Chain Rule: The network follows the chain with the most accumulated work, ensuring that the block with valid proof-of-work is accepted even if two blocks are found nearly simultaneously.
+
+#### Wallet
+- A bitcoin address is a 26-62 an alphanumeric character identifier (depending on the network and tools)
+- **Private key:** used by the sender of bitcoins to prove the ownership of bitcoins
+- **Public key:** used by anyone in the bitcoin network to verify ownerships of bitcoins
+- A key pair can be used for **Digital Signature** and Encryption/Decryption
+
+<br>
+
+<img src="./pics/1743001260677.jpg" alt="Events" width="400" />
+
+#### Hash function
+- It computes a unique identifier for a piece of data
+- Used to check the integrity of data
+- Use cases for Bitcoin:
+  - Making a fixed-length address
+  - Compress the signing data of a transaction
+
+#### Transaction
+<img src="./pics/1743001679082.jpg" alt="Events" width="400" />
+<img src="./pics/1743001698020.jpg" alt="Events" width="400" />
+
+<br>
+
+**Fees:**
+- Compensate miners for the node operation
+- Make economically infeasible for attackers to flood the network with transactions
+- A sender specifies the fee of his/her transaction
+- Miner chooses the transaction he/she wants to mine
+- The priority of transactions based on many different criteria, including fees
+- Transaction fees = Inputs – Outputs
+- Minimum can be set like 0.00001 BTC per kilobyte
+
+#### UTXO (Unspent Transaction Output)
+- Digital version of cash transactions
+- Instead of having an account balance, Bitcoin keeps track of individual “coins” (or portions of coins) that can be spent
+- Inputs and Outputs: A transaction consumes one or more UTXOs (inputs) and produces new UTXOs (outputs).
+  - Example: If you want to pay 0.5 BTC, you might use a 1 BTC UTXO. Your transaction will have:
+    - Input: 1 BTC from a previous transaction.
+    - Outputs: One output of 0.5 BTC to the recipient and another output of 0.5 BTC as “change” back to you.
+
+- No Overlap: Each UTXO can only be spent once. Once it’s used in a transaction, it’s considered “spent” and cannot be reused.
+
+<img src="./pics/1743002451586.jpg" alt="Events" width="400" />
+<img src="./pics/1743002511772.jpg" alt="Events" width="400" />
 
 --- 
 
