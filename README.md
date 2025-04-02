@@ -39,6 +39,18 @@ A repository for me to document my learning on solidity and smart contract
 - [Token Standards](#token-standards)
   - [ERC20 \& Fungible Tokens](#erc20--fungible-tokens)
   - [ERC721 \& Non-Fungible Tokens](#erc721--non-fungible-tokens)
+- [Vulnerability](#vulnerability)
+  - [Reentrancy Attacks](#reentrancy-attacks)
+  - [Reentrancy Mitigation](#reentrancy-mitigation)
+  - [Stack Size Limit](#stack-size-limit)
+  - [Blockchain Level Unpredictable State](#blockchain-level-unpredictable-state)
+- [Client(Node) APIs](#clientnode-apis)
+  - [Types of Ethereum Nodes](#types-of-ethereum-nodes)
+  - [Frequently used APIs](#frequently-used-apis)
+- [Ethereum Characteristics](#ethereum-characteristics)
+  - [EVM bytecode](#evm-bytecode)
+  - [ABI (Application Binary Interface)](#abi-application-binary-interface)
+- [Wallets](#wallets)
 ---
 
 ### Setting up Solidity development environment locally
@@ -695,3 +707,148 @@ When the `TokenizedBond` contract calls `transferFrom`:
 
 <br>
 
+### Vulnerability
+| Level      | Cause of Vulnerability | Simple Example                                                                                                                               |
+| :--------- | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Solidity** | Call to the unknown    | A contract calls an external address provided by a user. If the user provides the address of a malicious contract, it could execute harmful code. |
+|            | Gasless send           | Using `address.send(amount)` which only forwards 2300 gas. If the recipient is a contract needing more gas in its fallback function, the send fails silently (older Solidity) or reverts. |
+|            | Exception disorders    | In older Solidity versions (<0.8.0), external calls failing didn't automatically revert the parent transaction, potentially leaving the contract state inconsistent if not handled carefully. |
+|            | Type casts             | Incorrectly converting between types, e.g., casting a large `uint256` to `uint32` might truncate the value, leading to unexpected behaviour or overflow/underflow issues. |
+|            | Reentrancy             | A contract sends Ether to another contract. Before updating its own balance, the receiving contract calls back into the original one, withdrawing funds again. |
+|            | Keeping secrets        | Storing a "secret" value (like the answer to a puzzle or a private key) directly in a contract variable. All blockchain data is public.      |
+| **EVM**      | Immutable bugs         | Deploying a contract with a critical flaw in its logic (e.g., allowing anyone to withdraw funds). The bug cannot be fixed in the deployed instance. |
+|            | Ether lost in transfer | Sending Ether via `selfdestruct(target)` where `target` is a contract without a payable fallback/receive function; the Ether gets stuck.      |
+|            | Stack size limit       | A function makes too many nested internal or external calls (depth > 1024), causing the transaction to fail due to exceeding the EVM stack limit. |
+| **Blockchain** | Unpredictable state    | A lottery contract uses `block.number` to determine the winner. A miner could potentially manipulate which block includes the transaction to influence the outcome slightly. |
+|            | Generating randomness  | Using `block.timestamp` or `blockhash` as a source of randomness for a game. Miners can influence these values, making the outcome predictable or manipulable. |
+|            | Time constraints       | Relying on `block.timestamp` for precise timing. A contract might require an action within a 60-second window, but block times can vary, making this unreliable. |
+
+#### Reentrancy Attacks
+ <img src="./pics/1743596542413.jpg" alt="Reentrancy Attacks" width="400" />
+
+**Example Breakdown:**
+
+Initiation: The attacker (controlling the Mallory contract or an external account) calls the ping function on the Bob contract, passing the address of the Mallory contract as the argument c.
+Bob.ping(address(Mallory))
+
+Bob's ping Execution (First time):
+
+The ping function in Bob starts.
+
+bool sent is currently false.
+
+The if (!sent) condition is true (since !false is true), so the code inside the if block executes.
+
+`c.call.value(2)()`: This is the crucial step. Bob attempts to send 2 wei (a tiny amount of Ether) to the address c (which is the Mallory contract). This is an external call that transfers value.
+
+Mallory's Fallback Function Triggered:
+
+When a contract receives Ether via a low-level .call (or .send or .transfer) and no specific function data is provided (like in c.call.value(2)()), its fallback function is automatically executed. In this case, Mallory has a fallback function defined as function() { ... }.
+
+Because Bob just sent value (value(2)) without calling a named function on Mallory, the EVM executes Mallory's fallback function.
+
+Mallory Executes Malicious Code:
+
+Inside Mallory's fallback function, the line `Bob(msg.sender).ping(this)`; executes.
+
+msg.sender within Mallory's fallback function is the address of the contract that called it and sent the Ether – which is the Bob contract.
+
+Bob(msg.sender) casts Bob's address back to the Bob contract type.
+
+.ping(this): Mallory calls the ping function on the Bob contract again, passing its own address (this) as the argument c.
+
+Bob's ping Execution (Second time - Re-entered):
+
+The ping function in Bob starts executing again, before the first execution finished.
+
+Crucially, the line sent = true; from the first call to ping has not yet executed. It only happens after the c.call.value(2)() completes.
+
+Therefore, bool sent is still false for this second execution.
+
+The if (!sent) condition is true again.
+
+c.call.value(2)(): Bob attempts to send another 2 wei to Mallory.
+
+The Loop: This triggers Mallory's fallback function again, which calls Bob.ping again, and the cycle repeats. Each time Bob.ping is re-entered, the sent flag is still false, allowing another Ether transfer via c.call.value(2)() before the state is updated.
+
+Why it's a Vulnerability (Reentrancy):
+
+The vulnerability lies in the order of operations within Bob's ping function:
+
+Check condition (if (!sent)).
+
+Perform external interaction (`c.call.value(2)()`). <-- Vulnerable point
+
+Update state (sent = true;).
+
+The external call (c.call.value(2)()) transfers execution control to the Mallory contract. Mallory uses this opportunity to call back (re-enter) the ping function before Bob could update its state (sent = true). This allows bypassing the check that was intended to prevent multiple payouts.
+
+#### Reentrancy Mitigation
+1. Checks-Effects-Interaction Pattern
+   - Performs all necessary checks and updates the contract’s state before interacting with external addresses or other contracts
+2. Reentrancy Guard
+   - A variable (like locked) to prevent multiple function calls from entering the function at once
+
+#### Stack Size Limit
+* Each time a contract invokes another contract, the call stack grows by one frame
+* The call stack is bounded to 1024 frames (a further invocation throws an exception)
+  * e.g. Denial of service, griefing, breaking expected logic etc
+
+In Simple Terms: You can only stack things so high. In Ethereum, you can only make 1024 nested function calls deep within a single transaction. If you try to make the 1025th call, the whole operation fails. Attackers can sometimes force legitimate actions to hit this limit, preventing them from succeeding (Denial of Service).
+
+#### Blockchain Level Unpredictable State
+
+**Core Idea:**
+- A set of transactions updating the same contract state can be included in the same block
+- The order of transactions may affect on the contract state
+
+<img src="./pics/1743600643448.jpg" alt="Unpredictable state" width="400" />
+
+### Client(Node) APIs
+- Anyone can run a node on public blockchain
+
+#### Types of Ethereum Nodes
+<img src="./pics/1743601060421.jpg" alt="ETH nodes" width="400" />
+
+#### Frequently used APIs
+* Query blockchain state:
+  * `eth_blockNumber` - Get latest block number
+  * `eth_getBlockByNumber` - Fetch block data
+  * `eth_getTransactionByHash` - Get transaction details
+  * `eth_getTransactionReceipt` - Get transaction receipt
+  * `eth_getBalance` - Get balance of an account
+* Interact with smart contracts
+  * `eth_call` - Execute contract function without sending transaction
+  * `eth_estimateGas` - Estimate gas for transaction
+* Send transactions:
+  * `eth_sendTransaction` - Send a new transaction (requires unlocked account)
+  * `eth_sendRawTransaction` - Send a signed transaction
+* Subscription-based methods (for WebSockets):
+  * `eth_subscribe` - Subscribe to real-time blockchain events
+* Debug APIs
+  * `debug_traceTransaction`: Simulates a transaction without broadcasting it to the network, providing detailed execution traces for debugging.
+  * `debug_traceCall`: Retrieves the execution trace of a past transaction, showing opcodes, gas usage, and internal calls.
+
+### Ethereum Characteristics
+
+#### EVM bytecode
+- Solidity code is compiled by the Solidity compiler into bytecode
+- The bytecode is executed within the Ethereum Virtual Machine (EVM), with the majority of it being stored in the smart contract account
+
+#### ABI (Application Binary Interface)
+
+ABI defines the structure of smart contracts
+- Function names & parameters (input/output types)
+- Event signatures (used for logging)
+- State variable types (for interacting with storage)
+
+Dapps can call contract functions and decode return values using ABI
+- Every function call in Ethereum requires ABI encoding
+- The first 4 bytes represent a function selector (function signature)
+- The following bytes are parameter values
+- Example) keccak256("setValue(uint256)")[:4]
+  - 0x60fe47b1000000000000000000000000000000000000000000000000000000000000002a
+
+---
+
+### Wallets
