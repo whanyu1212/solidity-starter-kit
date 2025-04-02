@@ -15,6 +15,11 @@ A repository for me to document my learning on solidity and smart contract
   - [UTXO (Unspent Transaction Output)](#utxo-unspent-transaction-output)
 - [Ethereum Fundamentals](#ethereum-fundamentals)
   - [Ether Units](#ether-units)
+  - [Ethereum and Smart Contract](#ethereum-and-smart-contract)
+  - [Gas Fee](#gas-fee)
+  - [Account and Address](#account-and-address)
+  - [Transaction](#transaction-1)
+  - [Transaction Life Cycle](#transaction-life-cycle)
   - [Data Locations \& Best Practices](#data-locations--best-practices)
 - [Functions](#functions)
   - [Structure](#structure)
@@ -206,6 +211,11 @@ transaction for 10 seconds **+** A leader collects confirmations from other serv
 
 ### Ethereum Fundamentals
 
+> "What Ethereum intends to provide is a blockchain with a built-in fully fledged Turing-complete programming language that can be used to create 'contracts' that can be used to encode arbitrary state transition functions" &mdash; Ethereum whitepaper
+
+**Ethereum Virtual Machine (EVM)** is a decentralized runtime environment that executes smart contracts on the blockchain, ensuring that all nodes in the network achieve consensus on the computation results.
+
+
 #### Ether Units
 
 Ether Units Explained:
@@ -218,6 +228,92 @@ Ether Units Explained:
 
 <br>
 
+#### Ethereum and Smart Contract
+- Each contract contains EVM bytecode and maintains its own storage
+  - EVM bytecode is immutable after the deployment (it can SELFDESTRUCT, though)
+  - Storage can be updated by transactions
+
+<br>
+
+- Ethereum Virtual Machine (EVM) as a State Machine
+  - The global state consists of all accounts, balances, contract code, and storage at any given moment
+  - The state changes when a transaction is processed
+
+<img src="./pics/1743339856660.jpg" alt="Events" width="400" />
+
+<br>
+
+#### Gas Fee
+Every operation in Ethereum consumes a specific amount of gas
+
+- Users must pay for the gas required for their transactions to be processed
+  - Total Gas Cost = Gas Used X Gas Price
+  - Total Gas Cost (fee): How much a user need to pay with the native coin
+  - Gas Used: The number of gas units used to execute the transaction
+  - Gas Price: The price of gas, measured in Gwei (1 Gwei = 0.000000001 ETH)
+
+<br>
+
+- Users specify the maximum cost they can pay for their transactions
+  - Max Fee = Gas Limit X Gas Price
+    - Max Fee: Users can specify a maximum fee they are willing to pay
+    - Gas Limit: The maximum amount of gas the user is willing to spend for the transaction. It is hard to estimate the exact “Gas Used”
+    - Gas Price: The price the user is willing to pay per unit of gas. The higher the gasPrice, the faster the transaction will be mined by the miners/validators
+
+<img src="./pics/1743340348787.jpg" alt="Events" width="400" />
+
+<br>
+
+#### Account and Address
+*   Ethereum has two types of accounts: EOA and SA
+
+*   An **Externally Owned Account (EOA)** is typically created through a wallet
+    *   ECDSA with the secp256k1 curve is used for EOA accounts, similar to Bitcoin
+    *   An address of EOA is also derived from the public key, but the processing is different
+        *   Ethereum address calculation: `Keccak-256(PubKey)[12:]`
+        *   Bitcoin address calculation: `Base58Check(RIPEMD160(SHA256(PubKey)))`
+
+*   A **Smart Contract (SA)** is created by a transaction deploying the smart contract code
+    *   Smart Contract address calculation: `Keccak-256(SenderAddress||Nonce)[12:0]`
+
+<br>
+
+#### Transaction
+
+*   A transaction is a signed message that contains data necessary for transferring native tokens (ETH), interacting with smart contracts
+*   Transactions are the fundamental unit of communication between accounts
+    *   Only EOAs can initiate transactions
+        *   EOA -> EOA/SA
+        *   EOA -> SA -> SA -> EOA
+        *   (Impossible) SA -> EOA/SA
+*   Currently, there are three types of transactions:
+    *   Type 0 (legacy), Type 1 (AccessList, EIP-2930), and Type 2 (DynamicFee, EIP-1559)
+    *   All transaction types are still supported, with the main differences being related to gas fee optimization
+
+<br>
+
+#### Transaction Life Cycle
+
+```mermaid
+graph LR
+    A["Construct A<br>Transaction"];
+    B["Sign The<br>Transaction"];
+    C["Local<br>(Transaction)<br>Validation"];
+    D["Transaction<br>Broadcast"];
+    E["Miner Node<br>Accept The<br>Transaction"];
+    F["Mining &<br>Broadcasting<br>A Block"];
+    G["Local Node<br>Receive The<br>Block"];
+
+    A --> B;
+    B --> C;
+    C --> D;
+    D --> E;
+    E --> F;
+    F --> G;
+
+    %% Style the Local Validation node to be red
+    style C fill:#cc0000,stroke:#333,stroke-width:2px,color:#fff;
+```
 
 #### Data Locations & Best Practices
 
@@ -263,6 +359,8 @@ Ether Units Explained:
 - `memory`: Not referencing anything located in our contract's persisted storage.
 
 - `calldata`: Only needed when the function is declared as external and when the data type of the parameter is a reference type such as a mapping, struct, string, or array. Using value types like int or address do not require this label.
+
+<img src="./pics/1743568568414.jpg" alt="Access control" width="400" />
 
 <br>
 
@@ -392,6 +490,8 @@ Fungible tokens are digital assets that are interchangeable with each other and 
 
 ERC20 defines a standard set of functions and events that all **<u>fungible tokens</u>** should implement. Fungible means that each token is **<u>interchangeable</u>** with another (like currency, a.k.a **代币**).
 
+<img src="./pics/1743569288759.jpg" alt="ERC20 example" width="400" />
+
 This standard allows different tokens to interact with decentralized applications (dApps), exchanges, and other smart contracts in a consistent and predictable manner. Wallets and exchanges can easily integrate any **<u>ERC20-compliant</u>** token.
 
 It provides the basic functionality for <u>transferring tokens, approving spending by other accounts, and querying balances and total supply.</u>
@@ -421,6 +521,111 @@ classDiagram
 
 <br>
 
+Remark: The mechanism of `approve` and `allowance` in the context of interacting with intermediary contracts (e.g., marketplace/exchange)
+
+<details open>
+<summary>Example scenario </summary>
+
+```javascript
+console.log(`Player2 approving TokenizedBond contract ${bondAddress} to spend ${ethers.formatUnits(totalCost, stablecoinDecimals)} ${tokenSymbol}...`);
+    try {
+        const approveBondContractStablecoinTx = await mockStablecoin.connect(player2).approve(
+            bondAddress, // <<< Approve the ACTUAL bond contract
+            totalCost
+        );
+        await approveBondContractStablecoinTx.wait(1);
+        console.log("TokenizedBond contract approved for stablecoins successfully.");
+        const bondContractStablecoinAllowance = await mockStablecoin.allowance(player2.address, bondAddress);
+         // Add a check here to be sure the allowance is sufficient
+        if (bondContractStablecoinAllowance < totalCost) {
+             throw new Error(`TokenizedBond contract stablecoin allowance (${ethers.formatUnits(bondContractStablecoinAllowance, stablecoinDecimals)}) too low after approval (needs ${ethers.formatUnits(totalCost, stablecoinDecimals)}).`);
+        } else {
+             console.log(`Allowance check for TokenizedBond contract passed (${ethers.formatUnits(bondContractStablecoinAllowance, stablecoinDecimals)} ${tokenSymbol}).`);
+        }
+    } catch (error) {
+        console.error("Error approving TokenizedBond contract for stablecoins:", error);
+        process.exit(1);
+    }
+```
+
+**Scenario Setup from the Code:**
+
+1.  **The Token Owner:** `player2` - This entity owns some `mockStablecoin` tokens.
+2.  **The Token Contract:** `mockStablecoin` - This is the ERC20 contract that manages the balances and allowances for the stablecoin.
+3.  **The Intermediary Contract:** `TokenizedBond` (at address `bondAddress`) - This is the contract `player2` wants to interact with. To perform its function (presumably buying a bond), this contract needs to *spend* `player2`'s stablecoins.
+4.  **The Required Amount:** `totalCost` - The exact amount of stablecoins the `TokenizedBond` contract needs to pull from `player2`.
+
+**Explanation using the Code:**
+
+1.  **The Need for Approval (The "Why"):**
+    *   `player2` wants the `TokenizedBond` contract to do something that costs `totalCost` stablecoins.
+    *   The `TokenizedBond` contract cannot directly reach into `player2`'s wallet and take the tokens. That would be a massive security flaw.
+    *   `player2` also doesn't want to `transfer` the `totalCost` directly *to* the `bondAddress` first, because if the bond purchase fails later, the tokens are stuck in the bond contract's address.
+
+2.  **Granting Permission (`approve`):**
+    ```javascript
+    console.log(`Player2 approving TokenizedBond contract ${bondAddress} to spend ${ethers.formatUnits(totalCost, stablecoinDecimals)} ${tokenSymbol}...`);
+    // ...
+    const approveBondContractStablecoinTx = await mockStablecoin.connect(player2).approve(
+        bondAddress, // <<< The spender (intermediary) being approved
+        totalCost    // <<< The maximum amount the spender can take
+    );
+    await approveBondContractStablecoinTx.wait(1);
+    console.log("TokenizedBond contract approved for stablecoins successfully.");
+    ```
+    *   **`mockStablecoin.connect(player2)`:** This tells ethers.js that the following transaction (`.approve(...)`) should be signed and sent *by* `player2`. Only the token owner can approve spending of their tokens.
+    *   **`.approve(bondAddress, totalCost)`:** This is the core action. `player2` is calling the `approve` function *on the `mockStablecoin` contract*.
+        *   The first argument (`bondAddress`) is the **`spender`**. `player2` is saying: "I authorize the contract located at `bondAddress`..."
+        *   The second argument (`totalCost`) is the **`amount`**. "...to withdraw *up to* this maximum amount of my stablecoins."
+    *   **`await approveBondContractStablecoinTx.wait(1);`**: This waits for the `approve` transaction to be mined and confirmed on the blockchain. Only after this confirmation is the allowance actually set within the `mockStablecoin` contract's storage.
+    *   **What happened on-chain:** The `mockStablecoin` contract updated its internal ledger. It now stores something like: `allowances[player2.address][bondAddress] = totalCost`. Importantly, `player2`'s *balance* of stablecoins has **not** changed yet. The tokens are still in `player2`'s wallet.
+
+3.  **Verifying Permission (`allowance`):**
+    ```javascript
+    const bondContractStablecoinAllowance = await mockStablecoin.allowance(player2.address, bondAddress);
+    ```
+    *   This line demonstrates calling the `allowance` function *on the `mockStablecoin` contract*. This is a read-only (`view`) function.
+    *   **`player2.address`**: This is the `owner` whose allowance we are checking.
+    *   **`bondAddress`**: This is the `spender` whose permission level we are checking.
+    *   The function returns the current amount that `bondAddress` is allowed to spend from `player2.address`. After the successful `approve` call above, this *should* return `totalCost` (or potentially more if a higher approval was granted previously).
+
+4.  **The Sanity Check:**
+    ```javascript
+    if (bondContractStablecoinAllowance < totalCost) {
+         throw new Error(`...allowance (${...}) too low... needs (${...}).`);
+    } else {
+         console.log(`Allowance check passed (${...}).`);
+    }
+    ```
+    *   This is good practice in off-chain scripts. It explicitly checks if the `allowance` recorded on-chain is sufficient for the `totalCost` needed for the *next step*.
+    *   This confirms the `approve` transaction worked as expected before proceeding.
+
+**The Next Step (Implied): `transferFrom`**
+
+The *reason* `player2` performed the `approve` action is so that, in a subsequent step (likely initiated by `player2` calling a function like `purchaseBond()` on the `TokenizedBond` contract), the **`TokenizedBond` contract itself** can successfully execute the following operation *internally*:
+
+```solidity
+// Inside the TokenizedBond contract's Solidity code (conceptual)
+IERC20 stablecoin = IERC20(address_of_mockStablecoin);
+uint256 cost = /* get totalCost */;
+address buyer = /* get player2.address */;
+address recipient = /* where the funds should go, e.g., the bond contract itself or a treasury */;
+
+// This call is initiated BY the TokenizedBond contract
+stablecoin.transferFrom(buyer, recipient, cost);
+```
+
+When the `TokenizedBond` contract calls `transferFrom`:
+
+1.  The `mockStablecoin` contract receives the call.
+2.  It checks: Does `buyer` (`player2.address`) have enough balance (`>= cost`)?
+3.  It checks: Does the caller (`msg.sender`, which is the `TokenizedBond` contract's address `bondAddress`) have enough *allowance* from the `buyer` (`allowances[buyer][msg.sender] >= cost`)?
+4.  Because `player2` already called `approve(bondAddress, totalCost)`, this allowance check passes!
+5.  The `mockStablecoin` contract then deducts `cost` from `player2`'s balance, adds `cost` to the `recipient`'s balance, and reduces the allowance: `allowances[player2.address][bondAddress] -= cost`.
+
+**In essence, the code snippet shows `player2` setting up the permission slip (`approve`) and then double-checking that the permission slip was correctly recorded (`allowance`), paving the way for the `TokenizedBond` intermediary contract to later use that permission via `transferFrom`.**
+
+</details>
 
 #### ERC721 & Non-Fungible Tokens
   <br>
@@ -438,6 +643,8 @@ classDiagram
   <br>
   
   ERC721 defines the standard for **<u>non-fungible tokens</u>** on Ethereum. Each token is **<u>unique</u>** and represents distinct ownership (like digital art, collectibles, or real estate, a.k.a **非同质化代币**).
+
+  <img src="./pics/1743571356383.jpg" alt="NFT example" width="400" />
 
   This standard enables NFTs to be traded on marketplaces and integrated into various applications while maintaining their unique properties and ownership history.
 
