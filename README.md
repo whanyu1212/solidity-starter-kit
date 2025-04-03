@@ -51,6 +51,25 @@ A repository for me to document my learning on solidity and smart contract
   - [EVM bytecode](#evm-bytecode)
   - [ABI (Application Binary Interface)](#abi-application-binary-interface)
 - [Wallets](#wallets)
+  - [Non-custodial Wallet](#non-custodial-wallet)
+  - [Custodial Wallet](#custodial-wallet)
+  - [Smart Contract-based Wallets](#smart-contract-based-wallets)
+  - [Hardware Wallet](#hardware-wallet)
+  - [Technical Specification for Wallets](#technical-specification-for-wallets)
+  - [Decentralized Exchange (DEX)](#decentralized-exchange-dex)
+  - [How Automated Market Maker (AMM) works](#how-automated-market-maker-amm-works)
+- [Blockchain Infrastructure Services](#blockchain-infrastructure-services)
+  - [Concept of Oracle](#concept-of-oracle)
+  - [Chainlink: Decentralized Oracle Network (DON)](#chainlink-decentralized-oracle-network-don)
+    - [LINK token](#link-token)
+  - [Indexer](#indexer)
+    - [The Graph](#the-graph)
+  - [IPFS: Decentralized Storage](#ipfs-decentralized-storage)
+  - [Bridge: Cross-Chain Asset Transfers](#bridge-cross-chain-asset-transfers)
+    - [Lock \& Mint Bridge](#lock--mint-bridge)
+    - [Burn \& Release/Mint Bridge](#burn--releasemint-bridge)
+    - [Liquidity Pool-based](#liquidity-pool-based)
+  - [DEX Aggregator](#dex-aggregator)
 ---
 
 ### Setting up Solidity development environment locally
@@ -852,3 +871,189 @@ Dapps can call contract functions and decode return values using ABI
 ---
 
 ### Wallets
+custodial/non-custodial, MPC, hardware, or smart contract-based
+
+#### Non-custodial Wallet
+- Users fully control their private keys
+- No third party can access funds or freeze accounts
+- More secure (no trust required), but requires users to manage keys safely
+<img src="./pics/1743685445241.jpg" alt="metamask" width = 400/>
+
+<br>
+
+#### Custodial Wallet
+- Managed by a third party (e.g., an exchange or service provider)
+- Users do NOT have control over their private keys
+- Easier for beginners but relies on trust in the service provider
+<img src="./pics/1743685552876.jpg" alt="custodial wallet" width = 400/>
+
+<br>
+
+#### Smart Contract-based Wallets
+- Instead of using Externally Owned Accounts (EOAs), the wallet is a smart contract
+- Supports programmable security, social recovery, gas abstraction, and multi-signature
+- Does NOT require users to manage private keys directly
+<img src="./pics/1743685639894.jpg" alt="contract based wallet" width=400/>
+
+<br>
+
+#### Hardware Wallet
+- A physical device that stores private keys securely offline
+- Only signs transactions when connected to a computer or mobile device
+- Prevents private keys from being exposed to the internet
+<img src="./pics/1743685791783.jpg" alt="hardware wallet" width=400/>
+
+<brs>
+
+#### Technical Specification for Wallets
+- BIP-32: Hierarchical Deterministic (HD) Wallets
+  - Defines how wallets generate multiple addresses from a single seed phrase
+  - Uses a tree structure to derive keys for multiple accounts
+  - All modern wallets follow this standard
+- BIP-39: Mnemonic Phrases (Seed Phrases)
+  - Defines human-readable seed phrases (12 or 24 words) that generate private keys
+  - Example) avocado margin pool cluster roast dragon burden inform valid gospel trophy artwork
+- BIP-44: Multi-Asset Wallet Standard
+  - Allows a single wallet to store multiple cryptocurrencies.
+  - Defines Ethereum's standard derivation path: m/44'/60'/0'/0/0
+    - 44' → BIP-44 standard.
+    - 60' → Ethereum’s registered coin type.
+    - 0' → First account.
+  - It is not as widely used recently due to user’s preferences for single addresses across multiple chains
+
+#### Decentralized Exchange (DEX)
+- A type of cryptocurrency exchange that allows users to trade digital assets directly with each other without relying on a central authority
+- DEXs use smart contracts to execute trades securely and transparently
+- Key features:
+  - Non-Custodial: Users retain full control over their funds
+  - Permissionless: Anyone can trade or provide liquidity (without KYC requirements)
+  - Transparent: Trades and liquidity pools are publicly verifiable on-chain
+  - Automated Trading: Uses smart contract logic to execute swaps without intermediaries
+
+<br>
+
+#### How Automated Market Maker (AMM) works
+- Liquidity Pools: Instead of matching individual buyers and sellers, AMMs use liquidity pools. These are smart contracts holding reserves of two or more different crypto tokens.
+
+- Liquidity Providers (LPs): Users called Liquidity Providers deposit an equivalent value of two tokens into a specific pool (e.g., $100 worth of ETH and $100 worth of DAI into the ETH/DAI pool).
+
+- Mathematical Formula: The price of tokens within the pool is determined algorithmically by a mathematical formula based on the ratio of the tokens in the pool. The most famous and simple formula (popularized by Uniswap V1/V2) is the Constant Product Formula: x * y = k.
+
+  - x = Amount of Token A in the pool
+
+  - y = Amount of Token B in the pool
+
+  - k = A constant value (the "product")
+
+- Trading: When someone wants to trade (swap) Token A for Token B, they add Token A to the pool and remove Token B. To keep k constant (ignoring fees for simplicity), the amount of Token B they receive depends on how much the ratio changes. Adding more Token A increases x, so y must decrease to maintain k. This change in ratio dictates the price.
+
+- Price Impact & Slippage: The larger the trade relative to the size of the pool (the total value locked), the more the ratio changes, and the worse the price the trader gets compared to the initial quoted price. This difference is called slippage. Deeper pools (more liquidity) have less slippage for the same trade size.
+
+- LP Incentives: LPs are incentivized to provide liquidity because they earn a small percentage of the trading fees generated by swaps in their pool, proportional to their share of the pool.
+
+---
+
+### Blockchain Infrastructure Services
+
+#### Concept of Oracle
+- A blockchain oracle is a service that connects smart contracts with off-chain data
+- Oracles act as bridges between on-chain and off-chain systems
+- E.g,.) Price feeds of cryptocurrency, Random number generation, Prediction markets, …
+- It also can be used to transfer data from one blockchain network to another
+<img src="./pics/1743687625758.jpg" alt="oracle models" width = 400/>
+
+#### Chainlink: Decentralized Oracle Network (DON)
+1. Node Operators: Multiple independent nodes provide the same data
+2. Aggregation Contract:
+   1. Gathers responses from multiple nodes
+   2. Uses median or weighted average aggregation to filter out outliers
+3. Reputation System:
+   1. Evaluates oracle performance and penalizes dishonest actors
+4. Hybrid Smart Contracts:
+   1. Combines on-chain verification and off-chain computation
+<img src="./pics/1743688135885.jpg" alt="chainlinl" width=400/>
+
+##### LINK token
+1. Smart contract developers or node operators purchase LINK
+2. Developers pay LINK to oracle node operators for data services
+3. Node operators stake LINK to participate in oracle networks
+4. Malicious oracles get penalized (lose staked LINK if they provide false data)
+5. Honest oracles earn LINK rewards for reliable data feeds
+
+<br>
+
+#### Indexer
+- A specialized service or system that collects, processes, and organizes blockchain data to make it easily searchable and accessible
+- It helps decentralized applications (dApps), analytics platforms, and other blockchain users efficiently retrieve relevant information without needing to scan the entire blockchain
+
+*How to retrieve events from a contract without indexer*
+1. Scan Blocks for Logs
+2. Decode the Logs Using the Contract ABI
+3. Store Data or Repeat Steps 1–2 Every Time
+
+##### The Graph
+Blockchain data is difficult to query due to its append-only structure. The Graph indexes blockchain data into subgraphs, which can be queried efficiently.
+
+**How it works:**
+operates as a peer-to-peer network with different roles contributing to the indexing and querying process
+  - Indexer: Node operators that run The Graph software to index blockchain data
+  - Curator: Identifies useful subgraphs and stakes GRT tokens as a signal (It can lose values)
+  - Delegator: Supports indexers by staking GRT tokens
+  - Consumers: DAppsthat query indexed data paying GRT tokens
+
+**Key components to create a subgraph:**
+- Subgraph Manifest (`subgraph.yaml`): Defines the data sources (smart contracts) your subgraph will index, the events to monitor, and how to map event data to entities
+- GraphQLSchema (`schema.graphql`): Specifies the structure of the data to be stored and how it can be queried
+- AssemblyScriptMappings (`mapping.ts`): Contains functions that process blockchain events and transform them into entities defined in your schema
+
+<br>
+
+#### IPFS: Decentralized Storage
+1. Files are chunked and assigned CIDs (Content Identifiers).
+2. Nodes store file pieces and participate in peer-to-peer distribution.
+3. Users retrieve files using CID-based lookups.
+4. Users retrieve the file using its CID
+  - Instead of downloading from one server, users fetch parts from multiple peers, making the system faster and censorship-resistant
+
+<br>
+
+**Use cases of IPFS:**
+- NFT Metadata Storage: Storing NFT images and metadata
+- Decentralized Websites: Hosting websites that cannot be taken down (ENS + IPFS)
+- Blockchain Data Archiving: Storing large amounts of historical blockchain data (Ethereum, Solana)
+<img src="./pics/1743689712485.jpg" alt="storage types" width = 400/>
+<img src="./pics/1743689802254.jpg" alt="IPFS" width = 400/>
+
+<br>
+
+#### Bridge: Cross-Chain Asset Transfers
+A blockchain network cannot interact with other blockchains. Bridges enable token and data transfers between different blockchain networks
+
+Types of Bridges:
+<img src="./pics/1743689953262.jpg" alt="bridges" width=400/>
+
+##### Lock & Mint Bridge
+- (Pros) There is always 100% collateral to ‘back’ the destination chain tokens
+- (Cons) The smart contracts on the source chain become a honeypot for hackers
+- (Cons) Bridge is the single point of failure/trust of all bridged assets
+<img src="./pics/1743690054644.jpg" alt="lock and mint bridge" width=400/>
+
+<br>
+
+##### Burn & Release/Mint Bridge
+- (Pros) This approach removes friction when the same tokens are bridged from multiple chains
+- (Cons) Issuer is the single point of failure/trust allowing a risk of infinite inflation
+<img src="./pics/1743690054644.jpg" alt="burn and release bridge" width=400/>
+
+<br>
+
+##### Liquidity Pool-based
+- (Pros) No fragments of bridged assets
+- (Cons) Users cannot swap if there is not enough liquidity for thedesired tokenliquidity
+<img src="./pics/1743690245930.jpg" alt="liquidity pool" width=400/>
+
+<br>
+
+#### DEX Aggregator
+A smart shopping engine for crypto swaps, automatically finding and executing the most efficient trade route across various decentralized exchanges to save you money and effort
+<img src="./pics/1743690408888.jpg" alt="dex aggregator" width=400/>
