@@ -70,6 +70,10 @@ A repository for me to document my learning on solidity and smart contract
     - [Burn \& Release/Mint Bridge](#burn--releasemint-bridge)
     - [Liquidity Pool-based](#liquidity-pool-based)
   - [DEX Aggregator](#dex-aggregator)
+- [Ethereum's Scalability Issue](#ethereums-scalability-issue)
+  - [Scalability Issue](#scalability-issue)
+    - [Strategy to scale without sacrificing decentralization](#strategy-to-scale-without-sacrificing-decentralization)
+    - [Types of Rollups](#types-of-rollups)
 ---
 
 ### Setting up Solidity development environment locally
@@ -1057,3 +1061,42 @@ Types of Bridges:
 #### DEX Aggregator
 A smart shopping engine for crypto swaps, automatically finding and executing the most efficient trade route across various decentralized exchanges to save you money and effort
 <img src="./pics/1743690408888.jpg" alt="dex aggregator" width=400/>
+
+---
+
+### Ethereum's Scalability Issue
+It is impossible to fully achieve decentralization, security, and scalability simultaneously. Every blockchain must make trade-offs among these three factors i.e, security, scalability and decentralization.
+
+Remark: A system can only optimize for **two of the three properties** at any given time
+
+#### Scalability Issue
+- Physical Network Latency in Peer-to-Peer Systems
+- Cost of Vertical Hardware Scaling
+- Ethereum’s Data Structure Is Not Optimized for Parallel Execution
+
+##### Strategy to scale without sacrificing decentralization
+- Convert the monolithic blockchain into a modular blockchain 
+  - Each layer can be handled by different infrastructures
+- Adopt a rollup-centric model to increase scalability 
+  - Processing transactions off-chain
+  - Posting only compressed data or cryptographic proofs back to Ethereum
+<img src="./pics/1743740982787.jpg" alt="salability strategy" width=500/>
+<img src="./pics/1743741093228.jpg" alt="rollup illustration" width=500>
+
+##### Types of Rollups
+
+<u>Optimistic Rollups</u>
+
+- Assume transactions are valid unless challenged
+- Allows a dispute period for others to prove fraud
+- E.g.,) Optimism, Arbitrum
+
+<u>ZK Rollups</u>
+
+- Use zero-knowledge proofs to prove validity of transactions
+- Ethereum mainnetsmart contract verifies the proof
+- E.g.,) zkSync, Scroll, Starknet, Linea
+
+**<u> Remark: Without full data availability, both rollups become insecure and unverifiable </u>**
+- Optimistic Rollups need full data to enable fraud proofs during the challenge window
+- ZK Rollups need full data to allow clients to reconstruct the L2 state and validate the ZK proofs
